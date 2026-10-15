@@ -16,3 +16,10 @@ Fonte-PS3/
 # Por padrão, o áudio convertido não entra no Git.
 # Distribua apenas conteúdo para o qual você tenha permissão.
 patch/**/*.XVAG
+
+# Arquivos gerados para releases
+dist/
+release-v1.0/
+
+# Ferramentas locais
+xdelta3-*-windows-*/
