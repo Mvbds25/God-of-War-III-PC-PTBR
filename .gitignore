@@ -1,0 +1,18 @@
+# Não versionar instalações, dumps ou backups do jogo
+CUSA01623/
+*_BACKUP/
+Backup-Originais/
+Fonte-PS3/
+*.iso
+*.pkg
+*.exe
+
+# Temporários
+*.wav
+*.mp3
+*.tmp
+*.bak
+
+# Por padrão, o áudio convertido não entra no Git.
+# Distribua apenas conteúdo para o qual você tenha permissão.
+patch/**/*.XVAG
