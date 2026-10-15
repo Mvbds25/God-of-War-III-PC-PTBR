@@ -17,6 +17,7 @@ $Xdelta = Join-Path $PackageDir "tools\xdelta3.exe"
 $PortugueseRoot = Join-Path $GameDir "PORTUGUESE\SOUNDS\STREAMS_PS4"
 $AudioRoot = $GameDir
 $BackupRoot = Join-Path $GameDir "_PTBR_BACKUP_v1"
+$CreatedList = Join-Path $BackupRoot "_CRIADOS.txt"
 $TempRoot = Join-Path $env:TEMP ("GOW3_PTBR_" + [guid]::NewGuid().ToString("N"))
 
 foreach($p in @($ManifestPath,$PatchesRoot,$Xdelta,$PortugueseRoot)) {
@@ -27,6 +28,10 @@ $Manifest = @(Import-Csv -LiteralPath $ManifestPath)
 if($Manifest.Count -ne 1159) { throw "Manifesto invalido: esperado 1159, encontrado $($Manifest.Count)." }
 
 New-Item -ItemType Directory -Force -Path $BackupRoot,$TempRoot | Out-Null
+
+if(!(Test-Path -LiteralPath $CreatedList)) {
+    New-Item -ItemType File -Path $CreatedList -Force | Out-Null
+}
 
 # Index all XVAGs in the game by filename. SHA is calculated lazily only for candidates
 # with the expected name, keeping startup reasonably fast.
@@ -100,6 +105,12 @@ try {
                 if($bh1 -ne $bh2){ throw "Falha no backup: $($m.Destino)" }
             }
         }
+        else {
+            $JaRegistrados = @(Get-Content -LiteralPath $CreatedList -ErrorAction SilentlyContinue)
+            if($JaRegistrados -notcontains $m.Destino) {
+                Add-Content -LiteralPath $CreatedList -Value $m.Destino -Encoding UTF8
+            }
+        }
 
         Copy-Item -LiteralPath $p.Temp -Destination $dst -Force
         if((Get-FileHash $dst -Algorithm SHA256).Hash -ne $m.FinalSHA256) {
@@ -122,4 +133,5 @@ Manifesto: manifest.csv
 finally {
     if(Test-Path -LiteralPath $TempRoot){ Remove-Item -LiteralPath $TempRoot -Recurse -Force -ErrorAction SilentlyContinue }
 }
+
 
